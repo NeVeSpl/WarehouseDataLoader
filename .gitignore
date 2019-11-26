@@ -1,0 +1,7 @@
+.vs/
+WarehouseDataLoader.Benchmark/bin/
+WarehouseDataLoader.Benchmark/obj/
+WarehouseDataLoader.Test/bin/
+WarehouseDataLoader.Test/obj/
+WarehouseDataLoader/obj/
+WarehouseDataLoader/bin/
