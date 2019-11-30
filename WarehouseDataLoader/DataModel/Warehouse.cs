@@ -4,36 +4,26 @@ using System.Text;
 
 namespace WarehouseDataLoader.DataModel
 {
-    internal sealed class Warehouse
+    internal interface IWarehouse
     {
-        private readonly List<Item> items;
-        private int totalNumberOfItems;
+        IReadOnlyCollection<Shelf> Shelves { get; }
+        void AddItemToShelf(string itemId, string itemName, int itemQuantity, string shelf);
+    }
 
-        public string Name
-        {
-            get;
-        }
-        public IReadOnlyCollection<Item> Items
-        {
-            get => items;
-        }
-        public int TotalNumberOfItems
-        {
-            get => totalNumberOfItems;
-        }
+    internal sealed class Warehouse : IWarehouse
+    {
+        private readonly Dictionary<string, Shelf> shelves = new Dictionary<string, Shelf>();
+
+        public IReadOnlyCollection<Shelf> Shelves => shelves.Values;
 
 
-        public Warehouse(string name)
+        public void AddItemToShelf(string itemId, string itemName, int itemQuantity, string shelf)
         {
-            Name = name;
-            items = new List<Item>();
-        }
-
-
-        public void AddItem(Item item)
-        {
-            items.Add(item);
-            totalNumberOfItems += item.Amount;
+            if (!shelves.ContainsKey(shelf))
+            {
+                shelves[shelf] = new Shelf(shelf);
+            }            
+            shelves[shelf].AddItem(itemId, itemName, itemQuantity);
         }
     }
 }

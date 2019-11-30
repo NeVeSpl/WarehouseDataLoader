@@ -7,19 +7,19 @@ namespace WarehouseDataLoader.Parser.SplitBased
 {
     internal sealed class WarehouseStateParserSplitBased : IWarehouseStateParser
     {
-        private readonly IParserState state;
+        private readonly IWarehouse warehouse;
         private readonly List<string> invalidLines = new List<string>();
 
 
-        public WarehouseStateParserSplitBased(IParserState state)
+        public WarehouseStateParserSplitBased(IWarehouse state)
         {
-            this.state = state;
+            this.warehouse = state;
         }
 
 
         public ParsingResult GetResult()
         {
-            return new ParsingResult(invalidLines, state.Warehouses);
+            return new ParsingResult(invalidLines, warehouse.Shelves);
         }
         public void ParseLine(string line)
         {
@@ -41,9 +41,9 @@ namespace WarehouseDataLoader.Parser.SplitBased
                 {
                     isLineValid = true;
 
-                    foreach (var amountInWarehouse in stockPartParsingResult.amountPerWarehouse)
+                    foreach (var quantityOnShelf in stockPartParsingResult.quantityPerShelf)
                     {
-                        state.AddItemToWarehouse(itemName, itemId, amountInWarehouse.Amount, amountInWarehouse.WarehouseName);
+                        warehouse.AddItemToShelf(itemId, itemName, quantityOnShelf.Quantity, quantityOnShelf.Shelf);
                     }
                 }
             }
@@ -54,27 +54,27 @@ namespace WarehouseDataLoader.Parser.SplitBased
             }
         }
 
-        private (bool isStockPartValid, List<AmountInWarehouse> amountPerWarehouse) ParseStockPart(string stockPart)
+        private (bool isStockPartValid, List<QuantityOnShelf> quantityPerShelf) ParseStockPart(string stockPart)
         {
             bool isStockPartValid = true;
 
             string[] splitedStockPart = stockPart.Split('|');
-            var amountPerWarehouse = new List<AmountInWarehouse>(splitedStockPart.Length);
+            var quantityPerShelf = new List<QuantityOnShelf>(splitedStockPart.Length);
 
-            foreach (string warehousePart in splitedStockPart)
+            foreach (string shelfAndQuantity in splitedStockPart)
             {
-                string[] splitedWarehousePart = warehousePart.Split(',');
+                string[] splitedWarehousePart = shelfAndQuantity.Split(',');
                 if (splitedWarehousePart.Length == 2)
                 {
-                    string warehouseName = splitedWarehousePart[0];
-                    string itemAmount = splitedWarehousePart[1];
+                    string shelf = splitedWarehousePart[0];
+                    string quantity = splitedWarehousePart[1];
 
-                    bool isAmountParsedSuccessfully = int.TryParse(itemAmount, out int amount);
-                    isStockPartValid &= isAmountParsedSuccessfully;
+                    bool isQuantityParsedSuccessfully = int.TryParse(quantity, out int amount);
+                    isStockPartValid &= isQuantityParsedSuccessfully;
 
-                    if (isAmountParsedSuccessfully)
+                    if (isQuantityParsedSuccessfully)
                     {
-                        amountPerWarehouse.Add(new AmountInWarehouse(warehouseName, amount));
+                        quantityPerShelf.Add(new QuantityOnShelf(shelf, amount));
                     }
                 }
                 else
@@ -83,7 +83,7 @@ namespace WarehouseDataLoader.Parser.SplitBased
                 }
             }
 
-            return (isStockPartValid, amountPerWarehouse);
+            return (isStockPartValid, quantityPerShelf);
         }
         private bool IsCommentLine(string line)
         {
@@ -91,16 +91,16 @@ namespace WarehouseDataLoader.Parser.SplitBased
         }
 
 
-        private readonly struct AmountInWarehouse
+        private readonly struct QuantityOnShelf
         {
-            public readonly string WarehouseName;
-            public readonly int Amount;
+            public readonly string Shelf;
+            public readonly int Quantity;
 
 
-            public AmountInWarehouse(string name, int count)
+            public QuantityOnShelf(string shelf, int quantity)
             {
-                WarehouseName = name;
-                Amount = count;
+                Shelf = shelf;
+                Quantity = quantity;
             }
         }
     }

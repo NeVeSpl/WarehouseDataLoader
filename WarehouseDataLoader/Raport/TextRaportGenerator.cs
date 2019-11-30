@@ -10,21 +10,29 @@ namespace WarehouseDataLoader.Raport
     {
         public string Generate(ParsingResult parsingResult)
         {
-            var orderedWarehouses = parsingResult.Warehouses.OrderByDescending(x => x.TotalNumberOfItems).ThenByDescending(x => x.Name);
-            StringBuilder result = new StringBuilder();
+            var orderedShelves = parsingResult.Shelves.OrderByDescending(x => x.TotalQuantity).ThenBy(x => x.Name);
+            var result = new StringBuilder();
 
-            foreach (Warehouse warehouse in orderedWarehouses)
+            foreach (Shelf shelf in orderedShelves)
             {
-                result.AppendLine($"{warehouse.Name} (total {warehouse.TotalNumberOfItems})");
+                result.AppendLine($"{shelf.Name} (total {shelf.TotalQuantity})");
 
-                var orderedItems = warehouse.Items.OrderBy(x => x.Id);
+                var orderedItems = shelf.Items.OrderBy(x => x.Id);
 
                 foreach (Item item in orderedItems)
                 {
-                    result.AppendLine($"{item.Id}: {item.Amount}");
+                    result.AppendLine($"{item.Id}: {item.Quantity}");
                 }
 
                 result.AppendLine();
+            }
+
+            result.AppendLine();
+            result.AppendLine("# Invalid lines");
+            
+            foreach (string invalidLine in parsingResult.InvalidLines)
+            {
+                result.AppendLine(invalidLine);
             }
 
             return result.ToString().TrimEnd();

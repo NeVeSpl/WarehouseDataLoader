@@ -7,7 +7,7 @@ namespace WarehouseDataLoader.Benchmark
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<WarehouseStateParserBenchmarks>();
+            var summary = BenchmarkRunner.Run<ParserBenchmarks>();
         }
     }
 }

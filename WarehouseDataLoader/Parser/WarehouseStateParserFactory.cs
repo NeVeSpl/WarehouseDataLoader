@@ -15,13 +15,13 @@ namespace WarehouseDataLoader.Parser
             switch (type)
             {
                 case WarehouseStateParserType.SplitBased:
-                    return new WarehouseStateParserSplitBased(new ParserState());
+                    return new WarehouseStateParserSplitBased(new Warehouse());
                 case WarehouseStateParserType.RegexBased:
-                    return new WarehouseStateParserRegexBased(new ParserState());
+                    return new WarehouseStateParserRegexBased(new Warehouse());
                 case WarehouseStateParserType.SpanBased:
-                    return new WarehouseStateParserSpanBased(new ParserState(), new NoStringPool());
+                    return new WarehouseStateParserSpanBased(new Warehouse(), new NoStringPool());
                 case WarehouseStateParserType.IndexBased:
-                    return new WarehouseStateParserIndexBased(new ParserState());
+                    return new WarehouseStateParserIndexBased(new Warehouse());
             }
             throw new NotImplementedException();
         }

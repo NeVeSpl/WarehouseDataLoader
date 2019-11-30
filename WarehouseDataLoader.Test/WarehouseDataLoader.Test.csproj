@@ -9,15 +9,11 @@
   <ItemGroup>
     <None Remove="Data\ShouldPastSampleTest.in" />
     <None Remove="Data\ShouldPastSampleTest.out" />
-    <None Remove="Data\ShouldPastSampleTestWithSomeInvalidRows.in" />
-    <None Remove="Data\ShouldPastSampleTestWithSomeInvalidRows.out" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Data\ShouldPastSampleTest.in" />
     <EmbeddedResource Include="Data\ShouldPastSampleTest.out" />
-    <EmbeddedResource Include="Data\ShouldPastSampleTestWithSomeInvalidRows.in" />
-    <EmbeddedResource Include="Data\ShouldPastSampleTestWithSomeInvalidRows.out" />
   </ItemGroup>
 
   <ItemGroup>

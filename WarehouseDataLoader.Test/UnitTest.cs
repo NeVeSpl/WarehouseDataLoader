@@ -12,8 +12,7 @@ namespace WarehouseDataLoader.Test
     public class UnitTest
     {
         [TestMethod]
-        [DataRow("ShouldPastSampleTest")]
-        [DataRow("ShouldPastSampleTestWithSomeInvalidRows")]
+        [DataRow("ShouldPastSampleTest")]        
         public void TestParsingAndReportingByUsingSplitBasedParser(string testCaseName)
         {
             var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.SplitBased);
@@ -21,8 +20,7 @@ namespace WarehouseDataLoader.Test
         }
 
         [TestMethod]
-        [DataRow("ShouldPastSampleTest")]
-        [DataRow("ShouldPastSampleTestWithSomeInvalidRows")]
+        [DataRow("ShouldPastSampleTest")]       
         public void TestParsingAndReportingByUsingSpanBasedParser(string testCaseName)
         {
             var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.SpanBased);
@@ -30,8 +28,7 @@ namespace WarehouseDataLoader.Test
         }
 
         [TestMethod]
-        [DataRow("ShouldPastSampleTest")]
-        [DataRow("ShouldPastSampleTestWithSomeInvalidRows")]
+        [DataRow("ShouldPastSampleTest")]      
         public void TestParsingAndReportingByUsingRegexBasedParser(string testCaseName)
         {
             var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.RegexBased);
@@ -39,8 +36,7 @@ namespace WarehouseDataLoader.Test
         }
 
         [TestMethod]
-        [DataRow("ShouldPastSampleTest")]
-        [DataRow("ShouldPastSampleTestWithSomeInvalidRows")]
+        [DataRow("ShouldPastSampleTest")]       
         public void TestParsingAndReportingByUsingIndexBasedParser(string testCaseName)
         {
             var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.IndexBased);

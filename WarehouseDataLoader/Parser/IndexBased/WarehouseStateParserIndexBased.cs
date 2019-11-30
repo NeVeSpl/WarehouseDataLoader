@@ -8,19 +8,19 @@ namespace WarehouseDataLoader.Parser.IndexBased
 {
     internal sealed class WarehouseStateParserIndexBased : IWarehouseStateParser
     {
-        private readonly IParserState state;
+        private readonly IWarehouse warehouse;
         private readonly List<string> invalidLines = new List<string>();
 
 
-        public WarehouseStateParserIndexBased(IParserState state)
+        public WarehouseStateParserIndexBased(IWarehouse warehouse)
         {
-            this.state = state;
+            this.warehouse = warehouse;
         }
 
 
         public ParsingResult GetResult()
         {
-            return new ParsingResult(invalidLines, state.Warehouses);
+            return new ParsingResult(invalidLines, warehouse.Shelves);
         }
         public void ParseLine(string line)
         {
@@ -35,7 +35,7 @@ namespace WarehouseDataLoader.Parser.IndexBased
             {
                 string itemName = line.Substring(0, indexOfFirstDelimiter);
                 int indexOfSecondDelimiter = line.IndexOf(';', indexOfFirstDelimiter + 1);
-                if (indexOfSecondDelimiter > indexOfFirstDelimiter)
+                if (indexOfSecondDelimiter > -1)
                 {
                     string itemId = line.Substring(indexOfFirstDelimiter + 1, indexOfSecondDelimiter - indexOfFirstDelimiter - 1);
                     isLineValid = IsStockPartValid(line, indexOfSecondDelimiter + 1);
@@ -61,74 +61,74 @@ namespace WarehouseDataLoader.Parser.IndexBased
                 {
                     break;
                 }
-                ParseWarehouseAndAmount(line, stockPartFirstIndex, indexOfDelimiter - 1, itemName, itemId);
+                ParseShelfAndQuantity(line, stockPartFirstIndex, indexOfDelimiter - 1, itemName, itemId);
                 stockPartFirstIndex = indexOfDelimiter + 1;
             }
 
-            ParseWarehouseAndAmount(line, stockPartFirstIndex, line.Length - 1, itemName, itemId);
+            ParseShelfAndQuantity(line, stockPartFirstIndex, line.Length - 1, itemName, itemId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ParseWarehouseAndAmount(String line, int startIndex, int endIndex, string itemName, string itemId)
+        private void ParseShelfAndQuantity(String line, int startIndex, int endIndex, string itemName, string itemId)
         {
             var indexOfDelimiter = line.IndexOf(',', startIndex);
-            string warehouseName = line.Substring(startIndex, indexOfDelimiter - startIndex);
-            int itemAmount = ConvertStringRangeToInt(line, indexOfDelimiter + 1, endIndex);
+            string shelf = line.Substring(startIndex, indexOfDelimiter - startIndex);
+            int quantity = ConvertStringRangeToInt(line, indexOfDelimiter + 1, endIndex);
 
-            state.AddItemToWarehouse(itemName, itemId, itemAmount, warehouseName);
+            warehouse.AddItemToShelf(itemId, itemName, quantity, shelf);
         }
 
 
 
         private enum StockPartValidationState
         {
-            VerticalBar,
-            WarehouseName,
-            Comma,
-            ItemAmount,
+            VerticalBarToken,
+            ShelfToken,
+            CommaToken,
+            QuantityToken,
         }
         private bool IsStockPartValid(String line, int stockPartFirstIndex)
         {
-            var state = StockPartValidationState.VerticalBar;
+            var state = StockPartValidationState.VerticalBarToken;
             for (int i = stockPartFirstIndex; i < line.Length; ++i)
             {
                 char c = line[i];
                 switch (state)
                 {
-                    case StockPartValidationState.VerticalBar:
+                    case StockPartValidationState.VerticalBarToken:
                         if (!(c == ',') && !(c == '|'))
                         {
-                            state = StockPartValidationState.WarehouseName;
+                            state = StockPartValidationState.ShelfToken;
                         }
                         else
                         {
                             return false;
                         }
                         break;
-                    case StockPartValidationState.WarehouseName:
+                    case StockPartValidationState.ShelfToken:
                         if (c == ',')
                         {
-                            state = StockPartValidationState.Comma;
+                            state = StockPartValidationState.CommaToken;
                         }
                         if (c == '|')
                         {
                             return false;
                         }
                         break;
-                    case StockPartValidationState.Comma:
+                    case StockPartValidationState.CommaToken:
                         if (Char.IsDigit(c))
                         {
-                            state = StockPartValidationState.ItemAmount;
+                            state = StockPartValidationState.QuantityToken;
                         }
                         else
                         {
                             return false;
                         }
                         break;
-                    case StockPartValidationState.ItemAmount:
+                    case StockPartValidationState.QuantityToken:
                         if (c == '|')
                         {
-                            state = StockPartValidationState.VerticalBar;
+                            state = StockPartValidationState.VerticalBarToken;
                         }
                         else
                         {
@@ -140,7 +140,7 @@ namespace WarehouseDataLoader.Parser.IndexBased
                         break;
                 }
             }
-            return state == StockPartValidationState.ItemAmount;
+            return state == StockPartValidationState.QuantityToken;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

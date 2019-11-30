@@ -13,4 +13,8 @@
     <ProjectReference Include="..\WarehouseDataLoader\WarehouseDataLoader.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Hypotheses\" />
+  </ItemGroup>
+
 </Project>

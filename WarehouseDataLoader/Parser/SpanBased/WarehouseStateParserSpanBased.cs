@@ -9,21 +9,21 @@ namespace WarehouseDataLoader.Parser.SpanBased
 {
     internal sealed class WarehouseStateParserSpanBased : IWarehouseStateParser
     {
-        private readonly IParserState state;
+        private readonly IWarehouse warehouse;
         private readonly List<string> invalidLines = new List<string>();
         private readonly IStringPool stringPool;
 
 
-        public WarehouseStateParserSpanBased(IParserState state, IStringPool stringPool)
+        public WarehouseStateParserSpanBased(IWarehouse warehouse, IStringPool stringPool)
         {
-            this.state = state;
+            this.warehouse = warehouse;
             this.stringPool = stringPool;
         }
 
 
         public ParsingResult GetResult()
         {
-            return new ParsingResult(invalidLines, state.Warehouses);
+            return new ParsingResult(invalidLines, warehouse.Shelves);
         }
         public void ParseLine(string line)
         {
@@ -66,73 +66,73 @@ namespace WarehouseDataLoader.Parser.SpanBased
                 {
                     break;
                 }
-                ParseWarehouseAndAmount(splitResult.leftPart, itemName, itemId);
+                ParseShelfAndQuantity(splitResult.leftPart, itemName, itemId);
                 stockPart = splitResult.rightPart;
             }
 
-            ParseWarehouseAndAmount(stockPart, itemName, itemId);
+            ParseShelfAndQuantity(stockPart, itemName, itemId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ParseWarehouseAndAmount(in ReadOnlySpan<char> stockPart, string itemName, string itemId)
+        private void ParseShelfAndQuantity(in ReadOnlySpan<char> stockPart, string itemName, string itemId)
         {
             var splitResult = Split(stockPart, ',');
-            string warehouseName = stringPool.GetString(splitResult.leftPart);
-            int itemAmount = ConvertSpanToInt(splitResult.rightPart);
+            string shelf = stringPool.GetString(splitResult.leftPart);
+            int quantity = ConvertSpanToInt(splitResult.rightPart);
 
-            state.AddItemToWarehouse(itemName, itemId, itemAmount, warehouseName);
+            warehouse.AddItemToShelf(itemId, itemName, quantity, shelf);
         }
 
 
 
         private enum StockPartValidationState
         {
-            VerticalBar,
-            WarehouseName,
-            Comma,
-            ItemAmount,
+            VerticalBarToken,
+            ShelfToken,
+            CommaToken,
+            QuantityToken,
         }
         private bool IsStockPartValid(in ReadOnlySpan<char> stockPart)
         {
-            var state = StockPartValidationState.VerticalBar;
+            var state = StockPartValidationState.VerticalBarToken;
             foreach (char c in stockPart)
             {
                 switch (state)
                 {
-                    case StockPartValidationState.VerticalBar:
+                    case StockPartValidationState.VerticalBarToken:
                         if (!(c == ',') && !(c == '|'))
                         {
-                            state = StockPartValidationState.WarehouseName;
+                            state = StockPartValidationState.ShelfToken;
                         }
                         else
                         {
                             return false;
                         }
                         break;
-                    case StockPartValidationState.WarehouseName:
+                    case StockPartValidationState.ShelfToken:
                         if (c == ',')
                         {
-                            state = StockPartValidationState.Comma;
+                            state = StockPartValidationState.CommaToken;
                         }
                         if (c == '|')
                         {
                             return false;
                         }
                         break;
-                    case StockPartValidationState.Comma:
+                    case StockPartValidationState.CommaToken:
                         if (Char.IsDigit(c))
                         {
-                            state = StockPartValidationState.ItemAmount;
+                            state = StockPartValidationState.QuantityToken;
                         }
                         else
                         {
                             return false;
                         }
                         break;
-                    case StockPartValidationState.ItemAmount:
+                    case StockPartValidationState.QuantityToken:
                         if (c == '|')
                         {
-                            state = StockPartValidationState.VerticalBar;
+                            state = StockPartValidationState.VerticalBarToken;
                         }
                         else
                         {
@@ -144,7 +144,7 @@ namespace WarehouseDataLoader.Parser.SpanBased
                         break;
                 }
             }
-            return state == StockPartValidationState.ItemAmount;
+            return state == StockPartValidationState.QuantityToken;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -14,17 +14,18 @@ namespace WarehouseDataLoader.DataModel
         {
             get;
         }
-        public int Amount
+        public int Quantity
         {
             get;
+            set;
         }
 
 
-        public Item(string id, string name, int amount)
+        public Item(string id, string name, int quantity)
         {
             Id = id;
             Name = name;
-            Amount = amount;
+            Quantity = quantity;
         }
     }
 }

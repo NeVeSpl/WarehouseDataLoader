@@ -8,20 +8,20 @@ namespace WarehouseDataLoader.Parser.RegexBased
 {
     internal sealed class WarehouseStateParserRegexBased : IWarehouseStateParser
     {
-        private readonly IParserState state;
+        private readonly IWarehouse warehouse;
         private readonly List<string> invalidLines = new List<string>();
         private static readonly Regex pattern = new Regex(@"^([^;]*);([^;]*);([^,]*),(\d+)(?:\|([^,]*),(\d+))*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 
-        public WarehouseStateParserRegexBased(IParserState state)
+        public WarehouseStateParserRegexBased(IWarehouse warehouse)
         {
-            this.state = state;
+            this.warehouse = warehouse;
         }
 
 
         public ParsingResult GetResult()
         {
-            return new ParsingResult(invalidLines, state.Warehouses);
+            return new ParsingResult(invalidLines, warehouse.Shelves);
         }
 
         public void ParseLine(string line)
@@ -37,17 +37,17 @@ namespace WarehouseDataLoader.Parser.RegexBased
             {
                 string itemName = match.Groups[1].Captures[0].Value;
                 string itemId = match.Groups[2].Captures[0].Value;
-                string warehouseName = match.Groups[3].Captures[0].Value;
-                string itemAmountString = match.Groups[4].Captures[0].Value;
-                int itemAmount = int.Parse(itemAmountString);
-                state.AddItemToWarehouse(itemName, itemId, itemAmount, warehouseName);
+                string shelf = match.Groups[3].Captures[0].Value;
+                string itemQuantityString = match.Groups[4].Captures[0].Value;
+                int itemQuantity = int.Parse(itemQuantityString);
+                warehouse.AddItemToShelf(itemId, itemName, itemQuantity, shelf);
 
                 for (int i = 0; i < match.Groups[5].Captures.Count; ++i)
                 {
-                    warehouseName = match.Groups[5].Captures[i].Value;
-                    itemAmountString = match.Groups[6].Captures[i].Value;
-                    itemAmount = int.Parse(itemAmountString);
-                    state.AddItemToWarehouse(itemName, itemId, itemAmount, warehouseName);
+                    shelf = match.Groups[5].Captures[i].Value;
+                    itemQuantityString = match.Groups[6].Captures[i].Value;
+                    itemQuantity = int.Parse(itemQuantityString);
+                    warehouse.AddItemToShelf(itemId, itemName, itemQuantity, shelf);
                 }
             }
             else

@@ -15,9 +15,9 @@ namespace WarehouseDataLoader.Benchmark
     [RankColumn]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]
-    public class WarehouseStateParserBenchmarks
+    public class ParserBenchmarks
     {
-        private const int HowManyTimes = 30;
+        private const int HowManyTimes = 100;
         private readonly string[] SampleLines = new[]
             {               
                 "Bulbasaur;#001;Tokyo,1213|Yokohama,952|Osaka,459",
@@ -35,14 +35,23 @@ namespace WarehouseDataLoader.Benchmark
                 "Weedle;#013;Tokyo,1000|Yokohama,2000|Osaka,3000|Nagoya,4000|Sapporo,5000|Fukuoka,6000",
                 "Kakuna;#014;Tokyo,10000|Yokohama,20000|Osaka,30000|Nagoya,40000|Sapporo,50000",
                 "Beedrill;#015;Tokyo,10000|Yokohama,20000|Osaka,30000|Nagoya,40000",
-                "Pidgey;#016;Tokyo,100000|Yokohama,200000|Osaka,300000",
+                "Pidgey;#016;Jakarta,100000|Delhi,200000|Manila,300000",
+                "Pidgeotto;#017;Seoul,100000|Shanghai,200000|Mumbai,300000",
+                "Pidgeot;#018;New York City,100000|Yokohama,200000|Osaka,300000",
+                "Rattata;#019;Tokyo,100000|Yokohama,200000|Osaka,300000",
+                "Raticate;#020;Tokyo,100000|Yokohama,200000|Osaka,300000",
+                "Spearow;#021;Tokyo,100000|Yokohama,200000|Osaka,300000",
+                "Fearow;#022;Chongqing,123|Shanghai,234|Beijing,345|Lagos,456",
+                "Ekans;#023;Mumbai,123|Dhaka,234|Chengdu,345|Karachi,456",
+                "Arbok;#024;Guangzhou,123|Istanbul,234|Tokyo,345|Tianjin,456",
+                "Pikachu;#025;Moscow,123|São Paulo,234|Kinshasa,345|Delhi,456",
             };
 
 
         [Benchmark(Baseline = true)]
         public void SplitBased()
         {
-            var parser = new WarehouseStateParserSplitBased(new ParserStateStub());
+            var parser = new WarehouseStateParserSplitBased(new WarehouseStub());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
@@ -55,7 +64,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void SpanBased()
         {
-            var parser = new WarehouseStateParserSpanBased(new ParserStateStub(), new NoStringPool());
+            var parser = new WarehouseStateParserSpanBased(new WarehouseStub(), new NoStringPool());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
@@ -64,10 +73,11 @@ namespace WarehouseDataLoader.Benchmark
                 }
             }
         }
+
         [Benchmark]
         public void SpanBasedWithStringPool()
         {
-            var parser = new WarehouseStateParserSpanBased(new ParserStateStub(), new StringPool());
+            var parser = new WarehouseStateParserSpanBased(new WarehouseStub(), new StringPool());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
@@ -80,7 +90,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void RegexBased()
         {
-            var parser = new WarehouseStateParserRegexBased(new ParserStateStub());
+            var parser = new WarehouseStateParserRegexBased(new WarehouseStub());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
@@ -93,7 +103,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void IndexBased()
         {
-            var parser = new WarehouseStateParserIndexBased(new ParserStateStub());
+            var parser = new WarehouseStateParserIndexBased(new WarehouseStub());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
@@ -105,14 +115,11 @@ namespace WarehouseDataLoader.Benchmark
 
 
 
-
-
-
-        internal class ParserStateStub : IParserState
+        internal class WarehouseStub : IWarehouse
         {
-            public IReadOnlyCollection<Warehouse> Warehouses { get; }
+            public IReadOnlyCollection<Shelf> Shelves { get; }
 
-            public void AddItemToWarehouse(string itemName, string itemId, int itemAmount, string warehouseName)
+            public void AddItemToShelf(string itemId, string itemName, int itemAmount, string warehouseName)
             {
 
             }

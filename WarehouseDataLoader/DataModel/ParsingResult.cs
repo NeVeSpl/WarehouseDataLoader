@@ -11,16 +11,16 @@ namespace WarehouseDataLoader.DataModel
         {
             get;
         }
-        public IReadOnlyCollection<Warehouse> Warehouses
+        public IReadOnlyCollection<Shelf> Shelves
         {
             get;
         }
 
 
-        public ParsingResult(IEnumerable<string> invalidLines, IEnumerable<Warehouse> warehouses)
+        public ParsingResult(IEnumerable<string> invalidLines, IEnumerable<Shelf> shelves)
         {
             InvalidLines = invalidLines.ToArray();
-            Warehouses = warehouses.ToArray();
+            Shelves = shelves.ToArray();
         }
     }
 }
