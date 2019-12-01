@@ -58,15 +58,15 @@ namespace WarehouseDataLoader.Parser.IndexBased
         }
 
         private string? ParseString(string line, ref int currentIndex, char delimiter)
-        {
-            string? result = null;
+        {            
             int indexOfDelimiter = line.IndexOf(delimiter, currentIndex);
             if (indexOfDelimiter > -1)
             {
-                result = line.Substring(currentIndex, indexOfDelimiter - currentIndex);
+                int tempIndex = currentIndex;
                 currentIndex = indexOfDelimiter + 1;
+                return line.Substring(tempIndex, indexOfDelimiter - tempIndex);                
             }
-            return result;
+            return null;
         }
 
         private int ParseInt(string line, ref int currentIndex, char delimiter)
