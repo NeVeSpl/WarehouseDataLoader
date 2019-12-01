@@ -76,10 +76,10 @@ Ready Player One;978-0307887436;S-A,l
 
 ## Result : Benchmarks
 
-|                  Method |     Mean | Ratio | Rank |     Gen 0 | Gen 1 | Gen 2 |  Allocated |
-|------------------------ |---------:|------:|-----:|----------:|------:|------:|-----------:|
-|              IndexBased | 1.188 ms |  0.32 |    1 |  320.3125 |     - |     - |   490.5 KB |
-|               SpanBased | 1.402 ms |  0.37 |    2 |  318.3594 |     - |     - |  490.51 KB |
-| SpanBasedWithStringPool | 2.039 ms |  0.55 |    3 |    3.9063 |     - |     - |    9.54 KB |
-|              SplitBased | 3.707 ms |  1.00 |    4 | 1566.4063 |     - |     - | 2400.63 KB |
-|              RegexBased | 8.831 ms |  2.38 |    5 | 2828.1250 |     - |     - | 4335.79 KB |
+|                  Method |      Mean | Ratio | Rank |     Gen 0 | Gen 1 | Gen 2 |  Allocated |
+|------------------------ |----------:|------:|-----:|----------:|------:|------:|-----------:|
+|              IndexBased |  2.558 ms |  0.31 |    1 |  683.5938 |     - |     - | 1051.46 KB |
+|               SpanBased |  3.165 ms |  0.39 |    2 |  683.5938 |     - |     - | 1051.45 KB |
+| SpanBasedWithStringPool |  4.458 ms |  0.54 |    3 |    7.8125 |     - |     - |    19.5 KB |
+|              SplitBased |  8.264 ms |  1.00 |    4 | 3609.3750 |     - |     - | 5541.26 KB |
+|              RegexBased | 21.780 ms |  2.77 |    5 | 5800.0000 |     - |     - | 8978.76 KB |
