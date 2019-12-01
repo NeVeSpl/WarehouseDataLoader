@@ -10,6 +10,7 @@ using WarehouseDataLoader.Parser.RegexBased;
 using WarehouseDataLoader.Parser.SpanBased;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
 using WarehouseDataLoader.Parser.SplitBased;
+using StockPartValidatorForSpanBased = WarehouseDataLoader.Parser.SpanBased.StockPartValidator.StockPartValidatorOnStateMachine;
 
 namespace WarehouseDataLoader.Benchmark
 {
@@ -90,7 +91,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void SpanBased()
         {
-            var parser = new WarehouseStateParserSpanBased(new WarehouseStub(), new NoStringPool());
+            var parser = new WarehouseStateParserSpanBased(new WarehouseStub(), new NoStringPool(), new StockPartValidatorForSpanBased());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
@@ -103,7 +104,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void SpanBasedWithStringPool()
         {
-            var parser = new WarehouseStateParserSpanBased(new WarehouseStub(), new StringPool());
+            var parser = new WarehouseStateParserSpanBased(new WarehouseStub(), new StringPool(), new StockPartValidatorForSpanBased());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)

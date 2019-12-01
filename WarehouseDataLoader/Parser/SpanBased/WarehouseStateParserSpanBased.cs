@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using WarehouseDataLoader.DataModel;
+using WarehouseDataLoader.Parser.SpanBased.StockPartValidator;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
 
 namespace WarehouseDataLoader.Parser.SpanBased
@@ -12,12 +13,14 @@ namespace WarehouseDataLoader.Parser.SpanBased
         private readonly IWarehouse warehouse;
         private readonly List<string> invalidLines = new List<string>();
         private readonly IStringPool stringPool;
+        private readonly IStockPartValidator stockPartValidator;
 
 
-        public WarehouseStateParserSpanBased(IWarehouse warehouse, IStringPool stringPool)
+        public WarehouseStateParserSpanBased(IWarehouse warehouse, IStringPool stringPool, IStockPartValidator stockPartValidator)
         {
             this.warehouse = warehouse;
             this.stringPool = stringPool;
+            this.stockPartValidator = stockPartValidator;
         }
 
 
@@ -43,7 +46,7 @@ namespace WarehouseDataLoader.Parser.SpanBased
                 if (splitResult.isSplitted)
                 {
                     string itemId = stringPool.GetString(splitResult.leftPart);
-                    isLineValid = IsStockPartValid(splitResult.rightPart);
+                    isLineValid = stockPartValidator.Validate(splitResult.rightPart);
                     if (isLineValid)
                     {
                         ParseStockPart(splitResult.rightPart, itemName, itemId);
@@ -85,77 +88,8 @@ namespace WarehouseDataLoader.Parser.SpanBased
 
 
 
-        private enum StockPartValidationState
-        {
-            VerticalBarToken,
-            ShelfToken,
-            CommaToken,
-            QuantityToken,
-        }
-        private bool IsStockPartValid(in ReadOnlySpan<char> stockPart)
-        {
-            var state = StockPartValidationState.VerticalBarToken;
-            int quantityLength = 0;
-            foreach (char c in stockPart)
-            {
-                switch (state)
-                {
-                    case StockPartValidationState.VerticalBarToken:
-                        if (!(c == ',') && !(c == '|'))
-                        {
-                            state = StockPartValidationState.ShelfToken;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                        break;
-                    case StockPartValidationState.ShelfToken:
-                        if (c == ',')
-                        {
-                            state = StockPartValidationState.CommaToken;
-                        }
-                        if (c == '|')
-                        {
-                            return false;
-                        }
-                        break;
-                    case StockPartValidationState.CommaToken:
-                        if (Char.IsDigit(c))
-                        {
-                            state = StockPartValidationState.QuantityToken;
-                            quantityLength = 1;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                        break;
-                    case StockPartValidationState.QuantityToken:
-                        if (c == '|')
-                        {
-                            state = StockPartValidationState.VerticalBarToken;
-                        }
-                        else
-                        {
-                            if (!Char.IsDigit(c))
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                quantityLength++;
-                                if (quantityLength > 9)
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                        break;
-                }
-            }
-            return state == StockPartValidationState.QuantityToken;
-        }
+       
+       
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private SplitResult Split(in ReadOnlySpan<char> line, char delimiter)

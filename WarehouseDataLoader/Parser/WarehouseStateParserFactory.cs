@@ -6,6 +6,7 @@ using WarehouseDataLoader.Parser.RegexBased;
 using WarehouseDataLoader.Parser.SpanBased;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
 using WarehouseDataLoader.Parser.SplitBased;
+using StockPartValidatorForSpanBased = WarehouseDataLoader.Parser.SpanBased.StockPartValidator.StockPartValidatorOnStateMachine;
 
 namespace WarehouseDataLoader.Parser
 {
@@ -20,9 +21,9 @@ namespace WarehouseDataLoader.Parser
                 case WarehouseStateParserType.RegexBased:
                     return new WarehouseStateParserRegexBased(new Warehouse());
                 case WarehouseStateParserType.SpanBased:
-                    return new WarehouseStateParserSpanBased(new Warehouse(), new NoStringPool());
+                    return new WarehouseStateParserSpanBased(new Warehouse(), new NoStringPool(), new StockPartValidatorForSpanBased());
                 case WarehouseStateParserType.SpanBasedWithStringPool:
-                    return new WarehouseStateParserSpanBased(new Warehouse(), new StringPool());
+                    return new WarehouseStateParserSpanBased(new Warehouse(), new StringPool(), new StockPartValidatorForSpanBased());
                 case WarehouseStateParserType.IndexBased:
                     return new WarehouseStateParserIndexBased(new Warehouse(), new StockPartValidatorOnStateMachine());
             }
