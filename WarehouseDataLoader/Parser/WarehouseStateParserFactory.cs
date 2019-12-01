@@ -1,6 +1,7 @@
 ﻿using System;
 using WarehouseDataLoader.DataModel;
 using WarehouseDataLoader.Parser.IndexBased;
+using WarehouseDataLoader.Parser.IndexBased.StockPartValidator;
 using WarehouseDataLoader.Parser.RegexBased;
 using WarehouseDataLoader.Parser.SpanBased;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
@@ -23,7 +24,7 @@ namespace WarehouseDataLoader.Parser
                 case WarehouseStateParserType.SpanBasedWithStringPool:
                     return new WarehouseStateParserSpanBased(new Warehouse(), new StringPool());
                 case WarehouseStateParserType.IndexBased:
-                    return new WarehouseStateParserIndexBased(new Warehouse());
+                    return new WarehouseStateParserIndexBased(new Warehouse(), new StockPartValidatorOnStateMachine());
             }
             throw new NotImplementedException();
         }

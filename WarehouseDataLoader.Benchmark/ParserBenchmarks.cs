@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using WarehouseDataLoader.DataModel;
 using WarehouseDataLoader.Parser.IndexBased;
+using WarehouseDataLoader.Parser.IndexBased.StockPartValidator;
 using WarehouseDataLoader.Parser.RegexBased;
 using WarehouseDataLoader.Parser.SpanBased;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
@@ -128,7 +129,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void IndexBased()
         {
-            var parser = new WarehouseStateParserIndexBased(new WarehouseStub());
+            var parser = new WarehouseStateParserIndexBased(new WarehouseStub(), new StockPartValidatorOnStateMachine());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)

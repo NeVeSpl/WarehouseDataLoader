@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 using WarehouseDataLoader.DataModel;
+using WarehouseDataLoader.Parser.IndexBased.StockPartValidator;
 
 namespace WarehouseDataLoader.Parser.IndexBased
 {
     internal sealed class WarehouseStateParserIndexBased : IWarehouseStateParser
     {
         private readonly IWarehouse warehouse;
+        private readonly IStockPartValidator stockPartValidator;
         private readonly List<string> invalidLines = new List<string>();
 
 
-        public WarehouseStateParserIndexBased(IWarehouse warehouse)
+        public WarehouseStateParserIndexBased(IWarehouse warehouse, IStockPartValidator stockPartValidator)
         {
             this.warehouse = warehouse;
+            this.stockPartValidator = stockPartValidator;
         }
 
 
@@ -30,18 +32,21 @@ namespace WarehouseDataLoader.Parser.IndexBased
             }
 
             bool isLineValid = false;
-            int indexOfFirstDelimiter = line.IndexOf(';');
-            if (indexOfFirstDelimiter > -1)
+            int currentIndex = 0;
+
+            string? itemName = ParseString(line, ref currentIndex, ';');
+            string? itemId = ParseString(line, ref currentIndex, ';');
+
+            if ((!String.IsNullOrEmpty(itemName)) && (!String.IsNullOrEmpty(itemId)))
             {
-                string itemName = line.Substring(0, indexOfFirstDelimiter);
-                int indexOfSecondDelimiter = line.IndexOf(';', indexOfFirstDelimiter + 1);
-                if (indexOfSecondDelimiter > -1)
-                {
-                    string itemId = line.Substring(indexOfFirstDelimiter + 1, indexOfSecondDelimiter - indexOfFirstDelimiter - 1);
-                    isLineValid = IsStockPartValid(line, indexOfSecondDelimiter + 1);
-                    if (isLineValid)
+                isLineValid = stockPartValidator.Validate(line, currentIndex);
+                if (isLineValid)
+                {                   
+                    while(currentIndex < line.Length)
                     {
-                        ParseStockPart(line, indexOfSecondDelimiter + 1, itemName, itemId);
+                        string?  shelf = ParseString(line, ref currentIndex, ',');
+                        int quantity = ParseInt(line, ref currentIndex, '|');
+                        warehouse.AddItemToShelf(itemId, itemName, quantity, shelf!);
                     }
                 }
             }
@@ -52,95 +57,25 @@ namespace WarehouseDataLoader.Parser.IndexBased
             }
         }
 
-        private void ParseStockPart(String line, int stockPartFirstIndex, string itemName, string itemId)
+        private string? ParseString(string line, ref int currentIndex, char delimiter)
         {
-            while (true)
+            string? result = null;
+            int indexOfDelimiter = line.IndexOf(delimiter, currentIndex);
+            if (indexOfDelimiter > -1)
             {
-                var indexOfDelimiter = line.IndexOf('|', stockPartFirstIndex);
-                if (indexOfDelimiter == -1)
-                {
-                    break;
-                }
-                ParseShelfAndQuantity(line, stockPartFirstIndex, indexOfDelimiter - 1, itemName, itemId);
-                stockPartFirstIndex = indexOfDelimiter + 1;
+                result = line.Substring(currentIndex, indexOfDelimiter - currentIndex);
+                currentIndex = indexOfDelimiter + 1;
             }
-
-            ParseShelfAndQuantity(line, stockPartFirstIndex, line.Length - 1, itemName, itemId);
+            return result;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ParseShelfAndQuantity(String line, int startIndex, int endIndex, string itemName, string itemId)
-        {
-            var indexOfDelimiter = line.IndexOf(',', startIndex);
-            string shelf = line.Substring(startIndex, indexOfDelimiter - startIndex);
-            int quantity = ConvertStringRangeToInt(line, indexOfDelimiter + 1, endIndex);
-
-            warehouse.AddItemToShelf(itemId, itemName, quantity, shelf);
-        }
-
-
-
-        private enum StockPartValidationState
-        {
-            VerticalBarToken,
-            ShelfToken,
-            CommaToken,
-            QuantityToken,
-        }
-        private bool IsStockPartValid(String line, int stockPartFirstIndex)
-        {
-            var state = StockPartValidationState.VerticalBarToken;
-            for (int i = stockPartFirstIndex; i < line.Length; ++i)
-            {
-                char c = line[i];
-                switch (state)
-                {
-                    case StockPartValidationState.VerticalBarToken:
-                        if (!(c == ',') && !(c == '|'))
-                        {
-                            state = StockPartValidationState.ShelfToken;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                        break;
-                    case StockPartValidationState.ShelfToken:
-                        if (c == ',')
-                        {
-                            state = StockPartValidationState.CommaToken;
-                        }
-                        if (c == '|')
-                        {
-                            return false;
-                        }
-                        break;
-                    case StockPartValidationState.CommaToken:
-                        if (Char.IsDigit(c))
-                        {
-                            state = StockPartValidationState.QuantityToken;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                        break;
-                    case StockPartValidationState.QuantityToken:
-                        if (c == '|')
-                        {
-                            state = StockPartValidationState.VerticalBarToken;
-                        }
-                        else
-                        {
-                            if (!Char.IsDigit(c))
-                            {
-                                return false;
-                            }
-                        }
-                        break;
-                }
-            }
-            return state == StockPartValidationState.QuantityToken;
+        private int ParseInt(string line, ref int currentIndex, char delimiter)
+        {           
+            int indexOfDelimiter = line.IndexOf(delimiter, currentIndex);
+            int endIndex = indexOfDelimiter == -1 ? line.Length : indexOfDelimiter;
+            int result = ConvertStringRangeToInt(line, currentIndex, endIndex - 1);
+            currentIndex = indexOfDelimiter == -1 ? line.Length : indexOfDelimiter + 1;
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

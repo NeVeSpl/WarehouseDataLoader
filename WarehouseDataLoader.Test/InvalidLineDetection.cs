@@ -34,10 +34,24 @@ namespace WarehouseDataLoader.Test
             TestInvalidLineDetection("Item name;Item ID;Shelf,");
         }
 
+        [TestMethod]
+        public void ShouldDetectLineWithoutStockPart()
+        {
+            TestInvalidLineDetection("Item name;Item ID;");
+        }
+
         [TestMethod]       
         public void ShouldDetectLineWithTooLongQuantity()
         {
             TestInvalidLineDetection("Item name;Item ID;Shelf,1234567890");
+        }
+
+        [TestMethod]
+        [DataRow("Item name,Item ID;Shelf;1234567890|Shelf,7")]
+        [DataRow("Item name;Item ID;Shelf,1234567890|Shelf,7|")]
+        public void ShouldDetectIncorrectlyFormattedLine(string line)
+        {
+            TestInvalidLineDetection(line);
         }
 
 
