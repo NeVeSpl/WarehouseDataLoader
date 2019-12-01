@@ -27,14 +27,14 @@ namespace WarehouseDataLoader.Parser.SplitBased
                 return;
             }
 
-            string[] splitedLine = line.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            string[] splitedLine = line.Split(';', 3, StringSplitOptions.RemoveEmptyEntries);
             bool isLineValid = false;
 
-            if (splitedLine.Length >= 3)
+            if (splitedLine.Length == 3)
             {
                 string itemName = splitedLine[0];
                 string itemId = splitedLine[1];
-                string stockPart = line.Substring(itemName.Length + itemId.Length + 2);
+                string stockPart = splitedLine[2];               
                 var stockPartParsingResult = ParseStockPart(stockPart);
                 if (stockPartParsingResult.isStockPartValid)
                 {
