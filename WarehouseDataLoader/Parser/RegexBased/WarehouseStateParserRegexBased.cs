@@ -10,7 +10,7 @@ namespace WarehouseDataLoader.Parser.RegexBased
     {
         private readonly IWarehouse warehouse;
         private readonly List<string> invalidLines = new List<string>();
-        private static readonly Regex pattern = new Regex(@"^([^;]+);([^;]+);([^,]+),(\d{1,9})(?:\|([^,]+),(\d{1,9}))*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex pattern = new Regex(@"^([^;]+);([^;]+);([^,\|]+),(\d{1,9})(?:\|([^,\|]+),(\d{1,9}))*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 
         public WarehouseStateParserRegexBased(IWarehouse warehouse)
