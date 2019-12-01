@@ -15,7 +15,7 @@ token        | min length | max length | allowed characters
 ------------ | ---------- | -----------| ------------
 item name    | 1          | ∞          | any character except ;
 item id      | 1          | ∞          | any character except ;
-shelf        | 1          | ∞          | any character except , and |
+shelf        | 1          | ∞          | any character except , and \|
 quantity     | 1          | 9          | [0-9]
 
 - every line should contain at least one pair of (shelf, amount)
