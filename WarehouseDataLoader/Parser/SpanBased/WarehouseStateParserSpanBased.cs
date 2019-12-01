@@ -95,6 +95,7 @@ namespace WarehouseDataLoader.Parser.SpanBased
         private bool IsStockPartValid(in ReadOnlySpan<char> stockPart)
         {
             var state = StockPartValidationState.VerticalBarToken;
+            int quantityLength = 0;
             foreach (char c in stockPart)
             {
                 switch (state)
@@ -123,6 +124,7 @@ namespace WarehouseDataLoader.Parser.SpanBased
                         if (Char.IsDigit(c))
                         {
                             state = StockPartValidationState.QuantityToken;
+                            quantityLength = 1;
                         }
                         else
                         {
@@ -140,6 +142,14 @@ namespace WarehouseDataLoader.Parser.SpanBased
                             {
                                 return false;
                             }
+                            else
+                            {
+                                quantityLength++;
+                                if (quantityLength > 9)
+                                {
+                                    return false;
+                                }
+                            }
                         }
                         break;
                 }
@@ -152,12 +162,12 @@ namespace WarehouseDataLoader.Parser.SpanBased
         {
             int index = line.IndexOf(delimiter);
 
-            if (index == -1)
+            if ((index > 0) && (index < line.Length - 1))
             {
-                return new SplitResult(false);
+                return new SplitResult(line.Slice(0, index), line.Slice(index + 1));
             }
-
-            return new SplitResult(line.Slice(0, index), line.Slice(index + 1));
+           
+            return new SplitResult(false);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
