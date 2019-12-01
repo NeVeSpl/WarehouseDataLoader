@@ -11,7 +11,7 @@ namespace WarehouseDataLoader.Parser.SpanBased.StringPool
 
         public string GetString(in ReadOnlySpan<char> span)
         {
-            int hash = GetDeterministicHashCode(span);
+            int hash = GetDeterministicHashCode(in span);
             if (pool.ContainsKey(hash))
             {
                 string pooledString = pool[hash];

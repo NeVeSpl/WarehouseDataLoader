@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 using WarehouseDataLoader.DataModel;
 using WarehouseDataLoader.Parser.SpanBased.StockPartValidator;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
@@ -36,20 +35,25 @@ namespace WarehouseDataLoader.Parser.SpanBased
             }
 
             var lineAsSpan = line.AsSpan();
-            bool isLineValid = false;
+            bool isLineValid = false;          
 
-            var splitResult = Split(lineAsSpan, ';');
-            if (splitResult.isSplitted)
+            ReadOnlySpan<char> itemNameSpan = ParseString(ref lineAsSpan, ';');
+            ReadOnlySpan<char> itemIdSpan = ParseString(ref lineAsSpan, ';');
+
+            if ((!itemNameSpan.IsEmpty) && (!itemIdSpan.IsEmpty))
             {
-                string itemName = stringPool.GetString(splitResult.leftPart);
-                splitResult = Split(splitResult.rightPart, ';');
-                if (splitResult.isSplitted)
+                isLineValid = stockPartValidator.Validate(in lineAsSpan);
+                if (isLineValid)
                 {
-                    string itemId = stringPool.GetString(splitResult.leftPart);
-                    isLineValid = stockPartValidator.Validate(splitResult.rightPart);
-                    if (isLineValid)
+                    string itemName = stringPool.GetString(in itemNameSpan);
+                    string itemId = stringPool.GetString(in itemIdSpan);
+                    while (!lineAsSpan.IsEmpty)
                     {
-                        ParseStockPart(splitResult.rightPart, itemName, itemId);
+                        ReadOnlySpan<char> shelfSpan = ParseString(ref lineAsSpan, ',');
+                        int quantity = ParseInt(ref lineAsSpan, '|');
+                        
+                        string shelf = stringPool.GetString(in shelfSpan);
+                        warehouse.AddItemToShelf(itemId, itemName, quantity, shelf);
                     }
                 }
             }
@@ -60,48 +64,25 @@ namespace WarehouseDataLoader.Parser.SpanBased
             }
         }
 
-        private void ParseStockPart(ReadOnlySpan<char> stockPart, string itemName, string itemId)
-        {
-            while (true)
+        private ReadOnlySpan<char> ParseString(ref ReadOnlySpan<char> line, char delimiter)
+        {            
+            int indexOfDelimiter = line.IndexOf(delimiter);
+            if (indexOfDelimiter > -1)
             {
-                var splitResult = Split(stockPart, '|');
-                if (!splitResult.isSplitted)
-                {
-                    break;
-                }
-                ParseShelfAndQuantity(splitResult.leftPart, itemName, itemId);
-                stockPart = splitResult.rightPart;
+                var tempLine = line;
+                line = line.Slice(indexOfDelimiter + 1);
+                return tempLine.Slice(0, indexOfDelimiter);                
             }
-
-            ParseShelfAndQuantity(stockPart, itemName, itemId);
+            return ReadOnlySpan<char>.Empty;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ParseShelfAndQuantity(in ReadOnlySpan<char> stockPart, string itemName, string itemId)
+        private int ParseInt(ref ReadOnlySpan<char> line, char delimiter)
         {
-            var splitResult = Split(stockPart, ',');
-            string shelf = stringPool.GetString(splitResult.leftPart);
-            int quantity = ConvertSpanToInt(splitResult.rightPart);
-
-            warehouse.AddItemToShelf(itemId, itemName, quantity, shelf);
-        }
-
-
-
-       
-       
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private SplitResult Split(in ReadOnlySpan<char> line, char delimiter)
-        {
-            int index = line.IndexOf(delimiter);
-
-            if ((index > 0) && (index < line.Length - 1))
-            {
-                return new SplitResult(line.Slice(0, index), line.Slice(index + 1));
-            }
-           
-            return new SplitResult(false);
+            int indexOfDelimiter = line.IndexOf(delimiter);
+            var intSpan = indexOfDelimiter == -1 ? line : line.Slice(0, indexOfDelimiter);
+            int result = ConvertSpanToInt(in intSpan);
+            line = indexOfDelimiter == -1 ? ReadOnlySpan<char>.Empty : line.Slice(indexOfDelimiter + 1);
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -119,27 +100,6 @@ namespace WarehouseDataLoader.Parser.SpanBased
                 result = result * 10 + (span[i] - '0');
             }
             return result;
-        }
-
-
-        private readonly ref struct SplitResult
-        {
-            public readonly ReadOnlySpan<char> leftPart;
-            public readonly ReadOnlySpan<char> rightPart;
-            public readonly bool isSplitted;
-
-            public SplitResult(in ReadOnlySpan<char> leftPart, in ReadOnlySpan<char> rightPart)
-            {
-                this.leftPart = leftPart;
-                this.rightPart = rightPart;
-                this.isSplitted = true;
-            }
-            public SplitResult(bool isSplitted)
-            {
-                this.leftPart = null;
-                this.rightPart = null;
-                this.isSplitted = isSplitted;
-            }
         }
     }
 }
