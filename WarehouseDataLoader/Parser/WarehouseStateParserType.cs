@@ -4,11 +4,12 @@ using System.Text;
 
 namespace WarehouseDataLoader.Parser
 {
-    internal enum WarehouseStateParserType
+    public enum WarehouseStateParserType
     {
         SplitBased,
         RegexBased,
         SpanBased,
+        SpanBasedWithStringPool,
         IndexBased,
     }
 }

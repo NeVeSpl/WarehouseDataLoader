@@ -1,4 +1,4 @@
-## WarehouseDataLoader
+﻿## WarehouseDataLoader
 Sample C# parser showing how to change text to business objects.
 
 We are importing state of a warehouse. Every item can be located on many shelves in different quantities. We want to know what items are located on which shelf and in which quantity.
@@ -11,17 +11,17 @@ We are importing state of a warehouse. Every item can be located on many shelves
 ```
 item name;item id;shelf,amount|shelf,amount|shelf,amount
 ```
-First Header | min length | max length | allowed characters
+token        | min length | max length | allowed characters
 ------------ | ---------- | -----------| ------------
-item name    | 1          | 255        | any character except ;
-item id      | 1          | 64         | any character except ;
-shelf        | 1          | 64         | any character except ,
+item name    | 1          | ∞          | any character except ;
+item id      | 1          | ∞          | any character except ;
+shelf        | 1          | ∞          | any character except , and |
 quantity     | 1          | 9          | [0-9]
 
 - every line should contain at least one pair of (shelf, amount)
-- the same pair (item,shelf) can appear in many lines in that case we should add quantities
+- the same pair (item,shelf) can appear in many lines, in that case we should sum quantities
 - a line that starts with # is the comment and should be ignored
-- some lines may be incorrectly formatted we should detect them
+- some lines may be incorrectly formatted, we should detect them
 
 ### Output data format
 - shelves should be sorted by the total number of items and then by name

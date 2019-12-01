@@ -20,6 +20,8 @@ namespace WarehouseDataLoader.Parser
                     return new WarehouseStateParserRegexBased(new Warehouse());
                 case WarehouseStateParserType.SpanBased:
                     return new WarehouseStateParserSpanBased(new Warehouse(), new NoStringPool());
+                case WarehouseStateParserType.SpanBasedWithStringPool:
+                    return new WarehouseStateParserSpanBased(new Warehouse(), new StringPool());
                 case WarehouseStateParserType.IndexBased:
                     return new WarehouseStateParserIndexBased(new Warehouse());
             }

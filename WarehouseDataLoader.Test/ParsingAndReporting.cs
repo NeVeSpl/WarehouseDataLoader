@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WarehouseDataLoader.Parser;
 using WarehouseDataLoader.Raport;
 using WarehouseDataLoader.Test.Utils;
@@ -9,49 +9,53 @@ using WarehouseDataLoader.Test.Utils;
 namespace WarehouseDataLoader.Test
 {
     [TestClass]
-    public class UnitTest
+    public class ParsingAndReporting
     {
         [TestMethod]
         [DataRow("ShouldPastSampleTest")]        
-        public void TestParsingAndReportingByUsingSplitBasedParser(string testCaseName)
-        {
-            var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.SplitBased);
-            TestParsingAndReporting(testCaseName, parser);
+        public void SplitBasedParser(string testCaseName)
+        {        
+            TestParsingAndReporting(testCaseName, WarehouseStateParserType.SplitBased);
         }
 
         [TestMethod]
         [DataRow("ShouldPastSampleTest")]       
-        public void TestParsingAndReportingByUsingSpanBasedParser(string testCaseName)
+        public void SpanBasedParser(string testCaseName)
+        {           
+            TestParsingAndReporting(testCaseName, WarehouseStateParserType.SpanBased);
+        }
+
+        [TestMethod]
+        [DataRow("ShouldPastSampleTest")]
+        public void SpanBasedWithStringPool(string testCaseName)
         {
-            var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.SpanBased);
-            TestParsingAndReporting(testCaseName, parser);
+            TestParsingAndReporting(testCaseName, WarehouseStateParserType.SpanBasedWithStringPool);
         }
 
         [TestMethod]
         [DataRow("ShouldPastSampleTest")]      
-        public void TestParsingAndReportingByUsingRegexBasedParser(string testCaseName)
-        {
-            var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.RegexBased);
-            TestParsingAndReporting(testCaseName, parser);
+        public void RegexBasedParser(string testCaseName)
+        {         
+            TestParsingAndReporting(testCaseName, WarehouseStateParserType.RegexBased);
         }
 
         [TestMethod]
         [DataRow("ShouldPastSampleTest")]       
-        public void TestParsingAndReportingByUsingIndexBasedParser(string testCaseName)
-        {
-            var parser = WarehouseStateParserFactory.Create(WarehouseStateParserType.IndexBased);
-            TestParsingAndReporting(testCaseName, parser);
+        public void IndexBasedParser(string testCaseName)
+        {           
+            TestParsingAndReporting(testCaseName, WarehouseStateParserType.IndexBased);
         }
 
 
-        private void TestParsingAndReporting(string testCaseName, IWarehouseStateParser parser)
+        private void TestParsingAndReporting(string testCaseName, WarehouseStateParserType parserType)
         {
+            IWarehouseStateParser parser = WarehouseStateParserFactory.Create(parserType);
             string input = LoadResource(testCaseName + ".in");
             string expectedOutput = LoadResource(testCaseName + ".out");
 
-            string[] lines = input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            string[] inputLines = input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
 
-            foreach (var line in lines)
+            foreach (var line in inputLines)
             {
                 parser.ParseLine(line);
             }
@@ -72,7 +76,7 @@ namespace WarehouseDataLoader.Test
 
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             {
-                using (StreamReader reader = new StreamReader(stream))
+                using (var reader = new StreamReader(stream))
                 {
                     result = reader.ReadToEnd();
                 }
