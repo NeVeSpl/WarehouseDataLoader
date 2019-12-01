@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using WarehouseDataLoader.DataModel;
 
 namespace WarehouseDataLoader.Parser.SplitBased
@@ -28,14 +27,14 @@ namespace WarehouseDataLoader.Parser.SplitBased
                 return;
             }
 
-            string[] splitedLine = line.Split(';');
+            string[] splitedLine = line.Split(';', StringSplitOptions.RemoveEmptyEntries);
             bool isLineValid = false;
 
-            if (splitedLine.Length == 3)
+            if (splitedLine.Length >= 3)
             {
                 string itemName = splitedLine[0];
                 string itemId = splitedLine[1];
-                string stockPart = splitedLine[2];
+                string stockPart = line.Substring(itemName.Length + itemId.Length + 2);
                 var stockPartParsingResult = ParseStockPart(stockPart);
                 if (stockPartParsingResult.isStockPartValid)
                 {
@@ -63,24 +62,22 @@ namespace WarehouseDataLoader.Parser.SplitBased
 
             foreach (string shelfAndQuantity in splitedStockPart)
             {
-                string[] splitedWarehousePart = shelfAndQuantity.Split(',');
-                if (splitedWarehousePart.Length == 2)
+                bool isShelfAndQuantityValid = false;
+                string[] splitedShelfAndQuantity = shelfAndQuantity.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                if (splitedShelfAndQuantity.Length == 2)
                 {
-                    string shelf = splitedWarehousePart[0];
-                    string quantity = splitedWarehousePart[1];
+                    string shelf = splitedShelfAndQuantity[0];
+                    string quantityString = splitedShelfAndQuantity[1];
 
-                    bool isQuantityParsedSuccessfully = int.TryParse(quantity, out int amount);
-                    isStockPartValid &= isQuantityParsedSuccessfully;
+                    bool isQuantityParsedSuccessfully = int.TryParse(quantityString, out int quantity);                   
 
-                    if (isQuantityParsedSuccessfully)
+                    if ((isQuantityParsedSuccessfully) && (quantityString.Length < 10))
                     {
-                        quantityPerShelf.Add(new QuantityOnShelf(shelf, amount));
+                        quantityPerShelf.Add(new QuantityOnShelf(shelf, quantity));
+                        isShelfAndQuantityValid = true;
                     }
                 }
-                else
-                {
-                    isStockPartValid = false;
-                }
+                isStockPartValid &= isShelfAndQuantityValid;
             }
 
             return (isStockPartValid, quantityPerShelf);
