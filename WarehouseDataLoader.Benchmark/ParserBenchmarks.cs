@@ -33,7 +33,7 @@ namespace WarehouseDataLoader.Benchmark
                 "Blastoise;#009;Fukuoka,1",
                 "Caterpie;#010;Tokyo,1|Yokohama,2|Osaka,3|Nagoya,4|Sapporo,5|Fukuoka,6|Kobe,7|Kawasaki,8|Kyoto,9",
                 "Metapod;#011;Tokyo,10|Yokohama,20|Osaka,30|Nagoya,40|Sapporo,50|Fukuoka,60|Kobe,70|Kawasaki,80",
-                "Butterfree;#012;Tokyo,100|Yokohama,200|Osaka,300|Nagoya,400|Sapporo,500|Fukuoka,600|Kobe,700|",
+                "Butterfree;#012;Tokyo,100|Yokohama,200|Osaka,300|Nagoya,400|Sapporo,500|Fukuoka,600|Kobe,700",
                 "Weedle;#013;Tokyo,1000|Yokohama,2000|Osaka,3000|Nagoya,4000|Sapporo,5000|Fukuoka,6000",
                 "Kakuna;#014;Tokyo,10000|Yokohama,20000|Osaka,30000|Nagoya,40000|Sapporo,50000",
                 "Beedrill;#015;Tokyo,10000|Yokohama,20000|Osaka,30000|Nagoya,40000",

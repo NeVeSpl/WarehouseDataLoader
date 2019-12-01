@@ -78,8 +78,8 @@ Ready Player One;978-0307887436;S-A,l
 
 |                  Method |      Mean | Ratio | Rank |     Gen 0 | Gen 1 | Gen 2 |  Allocated |
 |------------------------ |----------:|------:|-----:|----------:|------:|------:|-----------:|
-|               SpanBased |  2.482 ms |  0.31 |    1 |  679.6875 |     - |     - |  1043.7 KB |
-|              IndexBased |  2.564 ms |  0.33 |    2 |  683.5938 |     - |     - | 1051.45 KB |
-| SpanBasedWithStringPool |  3.901 ms |  0.49 |    3 |   11.7188 |     - |     - |   19.38 KB |
-|              SplitBased |  7.933 ms |  1.00 |    4 | 3242.1875 |     - |     - | 4972.51 KB |
-|              RegexBased | 21.359 ms |  2.70 |    5 | 5843.7500 |     - |     - | 8978.76 KB |
+|               SpanBased |  2.474 ms |  0.31 |    1 |  699.2188 |     - |     - | 1074.37 KB |
+|              IndexBased |  2.578 ms |  0.33 |    2 |  699.2188 |     - |     - | 1074.34 KB |
+| SpanBasedWithStringPool |  3.919 ms |  0.50 |    3 |    7.8125 |     - |     - |   17.34 KB |
+|              SplitBased |  7.839 ms |  1.00 |    4 | 3242.1875 |     - |     - | 4968.05 KB |
+|              RegexBased | 20.015 ms |  2.55 |    5 | 6000.0000 |     - |     - | 9235.24 KB |
