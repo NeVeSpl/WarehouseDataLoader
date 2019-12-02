@@ -25,7 +25,7 @@ namespace WarehouseDataLoader.Parser
                 case WarehouseStateParserType.SpanBasedWithStringPool:
                     return new WarehouseStateParserSpanBased(new Warehouse(), new StringPool(), new StockPartValidatorForSpanBased());
                 case WarehouseStateParserType.IndexBased:
-                    return new WarehouseStateParserIndexBased(new Warehouse(), new StockPartValidatorOnStateMachine());
+                    return new WarehouseStateParserIndexBased(new Warehouse(), new StockPartValidatorLoopBased());
             }
             throw new NotImplementedException();
         }

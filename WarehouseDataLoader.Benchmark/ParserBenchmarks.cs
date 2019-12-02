@@ -130,7 +130,7 @@ namespace WarehouseDataLoader.Benchmark
         [Benchmark]
         public void IndexBased()
         {
-            var parser = new WarehouseStateParserIndexBased(new WarehouseStub(), new StockPartValidatorOnStateMachine());
+            var parser = new WarehouseStateParserIndexBased(new WarehouseStub(), new StockPartValidatorLoopBased());
             for (int i = 0; i < HowManyTimes; ++i)
             {
                 foreach (var line in SampleLines)
