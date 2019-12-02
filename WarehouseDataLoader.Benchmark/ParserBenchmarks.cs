@@ -10,7 +10,7 @@ using WarehouseDataLoader.Parser.RegexBased;
 using WarehouseDataLoader.Parser.SpanBased;
 using WarehouseDataLoader.Parser.SpanBased.StringPool;
 using WarehouseDataLoader.Parser.SplitBased;
-using StockPartValidatorForSpanBased = WarehouseDataLoader.Parser.SpanBased.StockPartValidator.StockPartValidatorOnStateMachine;
+using StockPartValidatorForSpanBased = WarehouseDataLoader.Parser.SpanBased.StockPartValidator.StockPartValidatorLoopBased;
 
 namespace WarehouseDataLoader.Benchmark
 {
