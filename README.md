@@ -76,10 +76,15 @@ Ready Player One;978-0307887436;S-A,l
 
 ## Result : Benchmarks
 
-|                  Method |      Mean | Ratio | Rank |     Gen 0 | Gen 1 | Gen 2 |  Allocated |
-|------------------------ |----------:|------:|-----:|----------:|------:|------:|-----------:|
-|              IndexBased |  1.966 ms |  0.27 |    1 |  701.1719 |     - |     - | 1074.34 KB |
-|               SpanBased |  1.972 ms |  0.27 |    1 |  699.2188 |     - |     - | 1074.39 KB |
-| SpanBasedWithStringPool |  3.359 ms |  0.46 |    2 |    7.8125 |     - |     - |   17.34 KB |
-|              SplitBased |  7.364 ms |  1.00 |    3 | 3234.3750 |     - |     - | 4968.08 KB |
-|              RegexBased | 19.400 ms |  2.63 |    4 | 6000.0000 |     - |     - | 9235.24 KB |
+
+``` ini
+Intel Core i7-9750H CPU 2.60GHz
+.NET Core SDK=3.1.301
+```
+|                  Method |     Mean | Ratio | Rank |     Gen 0 | Gen 1 | Gen 2 |  Allocated |
+|------------------------ |---------:|------:|-----:|----------:|------:|------:|-----------:|
+|               SpanBased | 1.044 ms |  0.26 |    1 |  173.8281 |     - |     - | 1074.37 KB |
+|              IndexBased | 1.046 ms |  0.26 |    1 |  173.8281 |     - |     - | 1074.34 KB |
+| SpanBasedWithStringPool | 1.776 ms |  0.45 |    2 |    1.9531 |     - |     - |   17.36 KB |
+|              SplitBased | 3.956 ms |  1.00 |    3 |  804.6875 |     - |     - | 4968.07 KB |
+|              RegexBased | 9.981 ms |  2.52 |    4 | 1500.0000 |     - |     - | 9235.26 KB |
